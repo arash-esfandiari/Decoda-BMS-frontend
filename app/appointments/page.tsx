@@ -88,25 +88,46 @@ export default function AppointmentsPage() {
         return colors[status as keyof typeof colors] || "bg-gray-50 text-gray-700 ring-gray-700/10";
     };
 
-    const renderPageNumbers = () => {
-        const pages: (number | string)[] = [];
-        const maxVisible = 5;
-
-        if (totalPages <= maxVisible) {
-            for (let i = 1; i <= totalPages; i++) {
-                pages.push(i);
-            }
-        } else {
-            pages.push(1);
-            if (page > 3) pages.push('...');
-            for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
-                pages.push(i);
-            }
-            if (page < totalPages - 2) pages.push('...');
-            pages.push(totalPages);
+    // Pagination Logic
+    const getPaginationRange = () => {
+        if (totalPages <= 10) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
 
-        return pages;
+        const range: (number | string)[] = [];
+        const showEllipsisStart = page > 4;
+        const showEllipsisEnd = page < totalPages - 3;
+
+        range.push(1);
+
+        if (showEllipsisStart) {
+            range.push("...");
+        }
+
+        let rangeStart = Math.max(2, page - 1);
+        let rangeEnd = Math.min(totalPages - 1, page + 1);
+
+        if (page < 4) {
+            rangeEnd = 5;
+            rangeStart = 2;
+        }
+        if (page > totalPages - 3) {
+            rangeStart = totalPages - 4;
+            rangeEnd = totalPages - 1;
+        }
+
+        for (let i = rangeStart; i <= rangeEnd; i++) {
+            if (i > 1 && i < totalPages) {
+                range.push(i);
+            }
+        }
+
+        if (showEllipsisEnd) {
+            range.push("...");
+        }
+
+        range.push(totalPages);
+        return range;
     };
 
     if (error) return <div className="p-8 text-red-500">Error loading appointments</div>;
@@ -212,47 +233,45 @@ export default function AppointmentsPage() {
                 </div>
             </Card>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="mt-6 flex items-center justify-between">
-                    <div className="text-sm text-slate-600">
-                        Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, totalAppointments)} of {totalAppointments} appointments
-                    </div>
-                    <div className="flex items-center gap-2">
+            {
+                totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 selec-none">
                         <button
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={page === 1}
-                            className="px-3 py-1 rounded-md bg-white/50 border border-slate-300 text-slate-700 hover:bg-white/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-slate-700 bg-white/40 rounded-full shadow-sm ring-1 ring-white/60 transition-all hover:bg-white/60 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Previous
+                            ← Previous
                         </button>
-                        <div className="flex gap-1">
-                            {renderPageNumbers().map((pageNum, idx) => (
+
+                        <div className="flex items-center gap-2">
+                            {getPaginationRange().map((p, i) => (
                                 <button
-                                    key={idx}
-                                    onClick={() => typeof pageNum === 'number' && setPage(pageNum)}
-                                    disabled={pageNum === '...'}
-                                    className={`px-3 py-1 rounded-md transition-colors ${pageNum === page
-                                        ? 'bg-blue-500 text-white'
-                                        : pageNum === '...'
-                                            ? 'cursor-default'
-                                            : 'bg-white/50 border border-slate-300 text-slate-700 hover:bg-white/80'
+                                    key={i}
+                                    onClick={() => typeof p === 'number' && setPage(p)}
+                                    disabled={typeof p !== 'number'}
+                                    className={`h-8 min-w-8 px-2 flex items-center justify-center rounded-full text-sm font-medium transition-all ${p === page
+                                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                                        : typeof p === 'number'
+                                            ? "bg-white/40 text-slate-700 hover:bg-white/60 hover:text-blue-600"
+                                            : "text-slate-400 cursor-default bg-transparent"
                                         }`}
                                 >
-                                    {pageNum}
+                                    {p}
                                 </button>
                             ))}
                         </div>
+
                         <button
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages}
-                            className="px-3 py-1 rounded-md bg-white/50 border border-slate-300 text-slate-700 hover:bg-white/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-slate-700 bg-white/40 rounded-full shadow-sm ring-1 ring-white/60 transition-all hover:bg-white/60 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Next
+                            Next →
                         </button>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div>
     );
 }

@@ -7,6 +7,9 @@ import { SimplePieChart } from "@/components/analytics/simple-pie-chart";
 import { SimpleLineChart } from "@/components/analytics/simple-line-chart";
 import AnalyticsLoading from "./loading";
 
+import { useRouter } from "next/navigation";
+import { formatDate } from "@/lib/formatDate";
+
 const formatCurrency = (cents: number) => {
     return new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -15,6 +18,7 @@ const formatCurrency = (cents: number) => {
 };
 
 export default function AnalyticsPage() {
+    const router = useRouter();
     const { data: stats, isLoading, error } = useAnalytics();
 
     if (isLoading) return <AnalyticsLoading />;
@@ -131,6 +135,93 @@ export default function AnalyticsPage() {
                             hideYAxis
                             unit="%"
                         />
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Charts Row 4 - Patient Insights */}
+            <div className="grid gap-6 md:grid-cols-2">
+                <Card className="border-white/20 bg-white/40 backdrop-blur-md shadow-lg overflow-hidden">
+                    <CardHeader>
+                        <CardTitle className="text-lg text-slate-800">Top Patients (Revenue)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-slate-500 uppercase bg-white/30 border-b border-white/20">
+                                    <tr>
+                                        <th className="px-6 py-3">Patient</th>
+                                        <th className="px-6 py-3 text-right">Visits</th>
+                                        <th className="px-6 py-3 text-right">Total Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {stats.top_patients.map((patient) => (
+                                        <tr
+                                            key={patient.id}
+                                            className="border-b border-white/10 hover:bg-white/50 transition-colors cursor-pointer"
+                                            onClick={() => router.push(`/patient-details?id=${patient.id}&from=analytics`)}
+                                        >
+                                            <td className="px-6 py-4 font-medium text-slate-900">{patient.name}</td>
+                                            <td className="px-6 py-4 text-right text-slate-600">{patient.visit_count}</td>
+                                            <td className="px-6 py-4 text-right font-medium text-green-600">{formatCurrency(patient.total_spent * 100)}</td>
+                                        </tr>
+                                    ))}
+                                    {stats.top_patients.length === 0 && (
+                                        <tr><td colSpan={3} className="px-6 py-4 text-center text-slate-500">No data available</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-white/20 bg-white/40 backdrop-blur-md shadow-lg overflow-hidden">
+                    <CardHeader>
+                        <CardTitle className="text-lg text-slate-800 flex items-center gap-2">
+                            Retention Opportunities
+                            <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 border border-amber-200">
+                                Due for Visit
+                            </span>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-slate-500 uppercase bg-white/30 border-b border-white/20">
+                                    <tr>
+                                        <th className="px-6 py-3">Patient</th>
+                                        <th className="px-6 py-3">Last Visit</th>
+                                        <th className="px-6 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {stats.retention_opportunities.map((patient) => (
+                                        <tr key={patient.id} className="border-b border-white/10 hover:bg-white/30 transition-colors">
+                                            <td className="px-6 py-4 font-medium text-slate-900">
+                                                <div>{patient.name}</div>
+                                                <div className="text-xs text-slate-500">{patient.phone}</div>
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-600">
+                                                {formatDate(patient.last_visit)}
+                                                <div className="text-xs text-amber-600 font-medium">{patient.days_since_last_visit} days ago</div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <a
+                                                    href={`tel:${patient.phone}`}
+                                                    className="text-blue-600 hover:text-blue-800 text-xs font-semibold hover:underline"
+                                                >
+                                                    Call Now
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {stats.retention_opportunities.length === 0 && (
+                                        <tr><td colSpan={3} className="px-6 py-4 text-center text-slate-500">No retention opportunities found</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

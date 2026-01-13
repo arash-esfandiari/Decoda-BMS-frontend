@@ -25,6 +25,25 @@ export interface AnalyticsSummary {
         revenue_by_provider: StatItem[];
         services_by_provider: StatItem[];
     };
+    top_patients: TopPatient[];
+    retention_opportunities: RetentionOpportunity[];
+}
+
+export interface TopPatient {
+    id: string;
+    name: string;
+    total_spent: number;
+    visit_count: number;
+    last_visit: string;
+}
+
+export interface RetentionOpportunity {
+    id: string;
+    name: string;
+    last_visit: string;
+    days_since_last_visit: number;
+    phone: string;
+    email: string;
 }
 
 export function useAnalytics() {
