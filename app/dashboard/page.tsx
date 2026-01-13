@@ -3,6 +3,8 @@
 import { useDashboard } from "@/hooks/useDashboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
+import { DataImportWidget } from "@/components/dashboard/data-import-widget";
+import DashboardLoading from "./loading";
 
 export default function DashboardPage() {
     const { data: stats, isLoading, error } = useDashboard();
@@ -17,7 +19,7 @@ export default function DashboardPage() {
     };
 
     if (isLoading) {
-        return <div className="p-8 text-slate-500">Loading your command center...</div>;
+        return <DashboardLoading />;
     }
 
     if (error) {
@@ -177,6 +179,8 @@ export default function DashboardPage() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    <DataImportWidget />
                 </div>
             </div>
         </div>

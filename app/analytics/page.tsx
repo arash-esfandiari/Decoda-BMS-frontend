@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimpleBarChart } from "@/components/analytics/simple-bar-chart";
 import { SimplePieChart } from "@/components/analytics/simple-pie-chart";
 import { SimpleLineChart } from "@/components/analytics/simple-line-chart";
+import AnalyticsLoading from "./loading";
 
 const formatCurrency = (cents: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -16,7 +17,7 @@ const formatCurrency = (cents: number) => {
 export default function AnalyticsPage() {
     const { data: stats, isLoading, error } = useAnalytics();
 
-    if (isLoading) return <div className="p-8 text-slate-500">Loading business intelligence...</div>;
+    if (isLoading) return <AnalyticsLoading />;
     if (error) return <div className="p-8 text-red-500">Error loading analytics data.</div>;
     if (!stats) return null;
 
