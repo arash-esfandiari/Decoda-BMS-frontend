@@ -42,7 +42,7 @@ export function useProviders(params: UseProvidersParams = {}) {
             }
 
             const { data } = await api.get<PaginatedProvidersResponse>(
-                `/providers?${searchParams.toString()}`
+                `/providers/?${searchParams.toString()}`
             );
             return data;
         },

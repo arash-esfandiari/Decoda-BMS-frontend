@@ -41,7 +41,7 @@ export function usePatients(
                 params.append("search", search);
             }
 
-            const { data } = await api.get<PatientResponse>(`/patients?${params.toString()}`);
+            const { data } = await api.get<PatientResponse>(`/patients/?${params.toString()}`);
             return data;
         },
     });

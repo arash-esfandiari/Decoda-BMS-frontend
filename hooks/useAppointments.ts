@@ -55,7 +55,7 @@ export function useAppointments(params: UseAppointmentsParams = {}) {
             }
 
             const { data } = await api.get<PaginatedAppointmentsResponse>(
-                `/appointments?${searchParams.toString()}`
+                `/appointments/?${searchParams.toString()}`
             );
             return data;
         },

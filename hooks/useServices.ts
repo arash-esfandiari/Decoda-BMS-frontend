@@ -42,7 +42,7 @@ export function useServices(params: UseServicesParams = {}) {
             }
 
             const { data } = await api.get<PaginatedServicesResponse>(
-                `/services?${searchParams.toString()}`
+                `/services/?${searchParams.toString()}`
             );
             return data;
         },
