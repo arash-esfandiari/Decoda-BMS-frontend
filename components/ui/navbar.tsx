@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -15,6 +17,7 @@ const navItems = [
 
 export function Navbar() {
     const pathname = usePathname();
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <nav className="sticky top-6 z-50 mx-auto w-full max-w-6xl rounded-2xl border border-white/20 bg-white/20 px-6 py-4 shadow-lg backdrop-blur-2xl backdrop-saturate-150 transition-all duration-500 hover:bg-white/30">
@@ -29,7 +32,7 @@ export function Navbar() {
                     <span className="text-lg font-bold tracking-tight text-slate-900">Decoda Beauty Med Spa</span>
                 </Link>
 
-                {/* Center Links */}
+                {/* Center Links (Desktop) */}
                 <div className="hidden items-center gap-8 md:flex">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
@@ -49,13 +52,47 @@ export function Navbar() {
                             </Link>
                         );
                     })}
-
                 </div>
 
-                {/* Right Buttons */}
+                {/* Right Buttons & Mobile Toggle */}
                 <div className="flex items-center gap-3">
-
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-white/40 text-slate-700 shadow-sm ring-1 ring-white/30 backdrop-blur-md transition-all hover:bg-white/60 md:hidden"
+                        onClick={() => setIsOpen(!isOpen)}
+                        aria-label="Toggle menu"
+                    >
+                        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                    </button>
                 </div>
+            </div>
+
+            {/* Mobile Menu Dropdown */}
+            <div
+                className={cn(
+                    "absolute left-0 right-0 top-full mt-4 flex flex-col gap-2 rounded-2xl border border-white/20 bg-white/95 p-4 shadow-xl backdrop-blur-3xl transition-all duration-300 ease-in-out md:hidden",
+                    isOpen
+                        ? "visible translate-y-0 opacity-100"
+                        : "invisible -translate-y-4 opacity-0"
+                )}
+            >
+                {navItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsOpen(false)}
+                            className={cn(
+                                "group flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium transition-all hover:bg-white/50",
+                                isActive ? "bg-white/50 text-blue-600" : "text-slate-700 hover:text-blue-600"
+                            )}
+                        >
+                            <span>{item.name}</span>
+                            {isActive && <div className="h-2 w-2 rounded-full bg-blue-500" />}
+                        </Link>
+                    );
+                })}
             </div>
         </nav>
     );

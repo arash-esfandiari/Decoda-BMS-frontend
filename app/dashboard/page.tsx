@@ -34,12 +34,6 @@ export default function DashboardPage() {
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">{getGreeting()}</h1>
                     <p className="text-slate-500 mt-1">Here is what's happening at Decoda Beauty Med Spa today, {formattedDate}.</p>
                 </div>
-                <div className="flex gap-3">
-                    <button className="rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 transition-all">
-                        View Calendar
-                    </button>
-
-                </div>
             </div>
 
             {/* Today's Pulse - Top Row Stats */}
