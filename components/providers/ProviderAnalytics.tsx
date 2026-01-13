@@ -113,7 +113,9 @@ export function ProviderAnalytics() {
                                     dataKey="provider_name"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fontSize: 11, fill: '#64748b', angle: -45, textAnchor: 'end', dy: 10 }}
+                                    tick={{ fontSize: 11, fill: '#64748b', dy: 10 }}
+                                    angle={-45}
+                                    textAnchor="end"
                                     height={60}
                                     interval={0}
                                 />
