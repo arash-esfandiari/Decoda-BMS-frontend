@@ -1,17 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import api from "@/lib/api";
+import { useChat, type ChatResult } from "@/hooks/useChat";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-type Row = Record<string, unknown>;
-
-type ChatResult = {
-    answer: string;
-    sql: string;
-    rows: Row[];
-};
 
 type Message = {
     id: string;
@@ -34,15 +26,15 @@ const formatValue = (value: unknown) => {
 };
 
 export default function ChatPage() {
+    const chatMutation = useChat();
     const [messages, setMessages] = useState<Message[]>([]);
     const [question, setQuestion] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [copiedId, setCopiedId] = useState<string | null>(null);
 
     const submitQuestion = async (text: string) => {
         const trimmed = text.trim();
-        if (!trimmed || isLoading) return;
+        if (!trimmed || chatMutation.isPending) return;
 
         const userMessage: Message = {
             id: `u-${Date.now()}`,
@@ -53,10 +45,8 @@ export default function ChatPage() {
         setMessages((prev) => [...prev, userMessage]);
         setQuestion("");
         setError("");
-        setIsLoading(true);
-
         try {
-            const { data } = await api.post<ChatResult>("/chat/ask", {
+            const data = await chatMutation.mutateAsync({
                 question: trimmed,
                 limit: 200,
             });
@@ -72,7 +62,7 @@ export default function ChatPage() {
         } catch (err: any) {
             setError(err?.response?.data?.detail || "Something went wrong. Try again.");
         } finally {
-            setIsLoading(false);
+            // mutation state handles loading
         }
     };
 
@@ -137,13 +127,13 @@ export default function ChatPage() {
                         <div className="flex items-center gap-3">
                             <button
                                 type="submit"
-                                disabled={!question.trim() || isLoading}
-                                className={`rounded-full px-6 py-2 text-sm font-semibold text-white transition ${isLoading || !question.trim()
+                                disabled={!question.trim() || chatMutation.isPending}
+                                className={`rounded-full px-6 py-2 text-sm font-semibold text-white transition ${chatMutation.isPending || !question.trim()
                                     ? "cursor-not-allowed bg-slate-300"
                                     : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                                     }`}
                             >
-                                {isLoading ? "Running..." : "Ask"}
+                                {chatMutation.isPending ? "Running..." : "Ask"}
                             </button>
                             {error && <span className="text-sm text-red-500">{error}</span>}
                         </div>
